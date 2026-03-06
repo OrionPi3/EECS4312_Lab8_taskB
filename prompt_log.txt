@@ -1,6 +1,91 @@
-## Student Name:
-## Student ID: 
+## Student Name: Johnmark Eustace
+## Student ID: 218811042
 
-Prompt #1: {}
-Response #1: {}
+Prompt #1: {
+
+    Prompt #1:
+You are assisting with implementing a Python module for an Event Registration with Waitlist system.
+
+Problem Summary:
+The system manages registration for a single event with a fixed capacity. Users may register until capacity is reached. Once capacity is full, additional users are placed in a FIFO waitlist. When a registered user cancels, the earliest waitlisted user is automatically promoted to the registered list.
+
+Functional Requirements:
+FR1. The system shall accept a fixed capacity at initialization.
+FR2. The system shall register users if capacity is not reached.
+FR3. The system shall place users in a FIFO waitlist if capacity is full.
+FR4. The system shall prevent duplicate registrations.
+FR5. The system shall allow cancellation of registered users.
+FR6. The system shall allow cancellation of waitlisted users.
+FR7. The system shall promote the earliest waitlisted user upon cancellation of a registered user.
+FR8. The system shall preserve FIFO ordering of the waitlist.
+FR9. The system shall allow users to query their status.
+FR10. The number of registered users shall never exceed capacity.
+FR11. The system shall behave deterministically under identical operation sequences.
+FR12. The system shall maintain consistency after every operation.
+
+Constraints:
+C1. Capacity must be a non-negative integer.
+C2. A user ID must be unique within the system.
+C3. A user may not exist in both the registered and waitlist lists simultaneously.
+C4. Registered list size must never exceed capacity.
+C5. Waitlist must follow strict FIFO ordering.
+C6. Promotions must occur immediately after a registered cancellation.
+C7. System state must remain valid after every operation.
+
+Acceptance Criteria:
+
+AC1:
+Given capacity > 0 and registered count < capacity
+When a new user registers
+Then the user is added to the registered list
+Linked Constraint ID(s): C1, C4
+
+AC2:
+Given capacity is full
+When a new user registers
+Then the user is added to the end of the waitlist
+Linked Constraint ID(s): C4, C5
+
+AC3:
+Given a registered user cancels, and the waitlist is not empty
+When cancellation occurs
+Then the earliest waitlisted user is promoted
+Linked Constraint ID(s): C5, C6
+
+AC4:
+Given that a user already exists in the system
+When the register is called
+Then the system rejects the duplicate registration
+Linked Constraint ID(s): C2
+
+AC5:
+Given that a waitlisted user cancels
+When cancellation occurs
+Then the user is removed, and no promotion occurs
+Linked Constraint ID(s): C5
+
+AC6:
+Given capacity = 0
+When any user registers
+Then the user is placed in the waitlist
+Linked Constraint ID(s): C1, C4
+
+Before writing code, identify any ambiguities or missing constraints in these requirements.
+
+
+}
+Response #1: {Response #1:
+The model reviewed the requirements and confirmed that the behavior of registration, waitlisting, promotion, and duplicate prevention was clear. It suggested clarifying how the query operation should report user status and how cancellation should behave if the user does not exist. The requirements were accepted with minor clarifications.
+
+}
 --------------------------------------------------
+
+Prompt #2 { What happens to the raise NotImplementedError("cancel not implemented yet") under the TODO parts. Do I just delete them? or can i leave them there? }
+
+Response #2 {The model explained that i needed to delete them because throws an error every time the function runs, and said if I leave it in the method, Python will stop execution immediately and your tests will fail.}
+
+--------------------------------------------------
+
+Prompt #3 { Below is the current set of test cases given already. Using the constraints from earlier, can you help with adding a couple more test cases to cover constraints C3, C6 and if there is an unknown user?}
+
+Response #3 {The model gave 3 different test cases which were designed for the targeted constraints. }
