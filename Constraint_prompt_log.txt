@@ -1,0 +1,11 @@
+Prompt 1:
+Help interpret the personas Jane and Mo and suggest possible system constraints and functional requirements for an event registration system.
+
+Purpose:
+To understand how persona characteristics can translate into system constraints, and to see if I missed any functionl requirements.
+
+Response summary:
+The response by the LLM gave constraints related to deterministic behavior, automatic conflict resolution, duplicate prevention, and explicit error handling.
+
+Decision:
+Used the information given by the LLM, but wrote the final constraints manually.

@@ -1,309 +1,44 @@
 ## Student Name: Johnmark Eustace
 ## Student ID: 218811042
 
-Prompt #1: {I need help with implementing a Python module for an Event Registration with Waitlist system.
+Prompt 1:
+I am building an event registration system with waitlist support.
+The Personas are:
+1. Jane - busy professional who wants predictable automated behavior.
+2. Mo - accessibility-focused user who requires deterministic system behavior and clear error handling.
 
-Problem Summary:
-The system manages registration for a single event with a fixed capacity. Users may register until capacity is reached. Once capacity is full, additional users are placed in a FIFO waitlist. When a registered user cancels, the earliest waitlisted user is automatically promoted to the registered list.
-
-Functional Requirements:
-FR1. The system shall accept a fixed capacity at initialization.
-FR2. The system shall register users if capacity is not reached.
-FR3. The system shall place users in a FIFO waitlist if capacity is full.
-FR4. The system shall prevent duplicate registrations.
-FR5. The system shall allow cancellation of registered users.
-FR6. The system shall allow cancellation of waitlisted users.
-FR7. The system shall promote the earliest waitlisted user upon cancellation of a registered user.
-FR8. The system shall preserve FIFO ordering of the waitlist.
-FR9. The system shall allow users to query their status.
-FR10. The number of registered users shall never exceed capacity.
-FR11. The system shall behave deterministically under identical operation sequences.
-FR12. The system shall maintain consistency after every operation.
+Below are the following constraints given to me by the lab doc:
 
 Constraints:
-C1. Capacity must be a non-negative integer.
-C2. A user ID must be unique within the system.
-C3. A user may not exist in both the registered and waitlist lists simultaneously.
-C4. Registered list size must never exceed capacity.
-C5. Waitlist must follow strict FIFO ordering.
-C6. Promotions must occur immediately after a registered cancellation.
-C7. System state must remain valid after every operation.
+- deterministic ordering
+- FIFO waitlist promotion
+- duplicate registration prevention
+- explicit handling of edge cases
+- cancellation error handling
 
-Acceptance Criteria:
+Acceptance criteria:
+- users register until capacity reached
+- extra users go to waitlist
+- waitlisted users promoted when cancellation occurs
+- duplicate registrations rejected
+- cancellation of unknown user raises error
 
-AC1:
-Given capacity > 0 and registered count < capacity
-When a new user registers
-Then the user is added to the registered list
-Linked Constraint ID(s): C1, C4
+Please review the specification and identify missing constraints, ambiguous requirements, unhandled edge cases, requirements and personas.
 
-AC2:
-Given capacity is full
-When a new user registers
-Then the user is added to the end of the waitlist
-Linked Constraint ID(s): C4, C5
+Response summary:
+The LLM suggested making the edge cases clearer to unerstand such as capacity zero, duplicate registrations, and deterministic ordering.
 
-AC3:
-Given a registered user cancels, and the waitlist is not empty
-When cancellation occurs
-Then the earliest waitlisted user is promoted
-Linked Constraint ID(s): C5, C6
+Decision:
+I used the suggestions given by the LLM and incorporated them into requirements, and edge cases.
 
-AC4:
-Given that a user already exists in the system
-When the register is called
-Then the system rejects the duplicate registration
-Linked Constraint ID(s): C2
 
-AC5:
-Given that a waitlisted user cancels
-When cancellation occurs
-Then the user is removed, and no promotion occurs
-Linked Constraint ID(s): C5
+-----------------------------------------
 
-AC6:
-Given capacity = 0
-When any user registers
-Then the user is placed in the waitlist
-Linked Constraint ID(s): C1, C4
+Prompt 2: Below are my solution.py and test.py codes, are there any changes that need to be done to either of these codes, so that they satisfy the tasks in the Lab 9 doc?
 
-Before writing code, identify any ambiguities or missing constraints in these requirements.
+Response summary:
+The LLM highlighted all the key parts in my codes explaining which parts satisfied different constraints, invariants, and FIFO waitlist.
 
 
-}
-Response #1: {Response #1:
-The model reviewed the requirements and confirmed that the behavior of registration, waitlisting, promotion, and duplicate prevention was clear. It suggested clarifying how the query operation should report user status and how cancellation should behave if the user does not exist. The requirements were accepted with minor clarifications.
 
-}
---------------------------------------------------
 
-Prompt #2 {Below is the code for solution.py, which as given to us. Can u explain to me the code given and how it connects to the requirements above. What should paarst of the code look Linked
-
-
-    """
-Task B: Event Registration with Waitlist (Stub)
-In this lab, you will design and implement an Event Registration with Waitlist system using an LLM assistant as your primary programming collaborator. 
-You are asked to implement a Python module that manages registration for a single event with a fixed capacity. 
-The system must:
-•	Accept a fixed capacity.
-•	Register users until capacity is reached.
-•	Place additional users into a FIFO waitlist.
-•	Automatically promote the earliest waitlisted user when a registered user cancels.
-•	Prevent duplicate registrations.
-•	Allow users to query their current status.
-
-The system must ensure that:
-•	The number of registered users never exceeds capacity.
-•	Waitlist ordering preserves FIFO behavior.
-•	Promotions occur deterministically under identical operation sequences.
-
-The module must preserve the following invariants:
-•	A user may not appear more than once in the system.
-•	A user may not simultaneously exist in multiple states.
-•	The system state must remain consistent after every operation.
-
-The system must correctly handle non-trivial scenarios such as:
-•	Multiple cancellations in sequence.
-•	Users attempting to re-register after canceling.
-•	Waitlisted users canceling before promotion.
-•	Capacity equal to zero.
-•	Simultaneous or rapid consecutive operations.
-•	Queries during state transitions.
-
-The output consists of the updated registration state and ordered lists of registered and waitlisted users after each operation.
-"""
-
-from dataclasses import dataclass
-from typing import List, Optional
-
-
-class DuplicateRequest(Exception):
-    """Raised if a user tries to register but is already registered or waitlisted."""
-    pass
-
-
-class NotFound(Exception):
-    """Raised if a user cannot be found for cancellation (if required by handout)."""
-    pass
-
-
-@dataclass(frozen=True)
-class UserStatus:
-    """
-    state:
-      - "registered"
-      - "waitlisted"
-      - "none"
-    position: 1-based waitlist position if waitlisted; otherwise None
-    """
-    state: str
-    position: Optional[int] = None
-
-
-class EventRegistration:
-    """
-    Students must implement this class per the lab handout.
-    Deterministic ordering is required (e.g., FIFO waitlist, predictable registration order).
-    """
-
-    def __init__(self, capacity: int) -> None:
-        """
-        Args:
-            capacity: maximum number of registered users (>= 0)
-        """
-        # TODO: Initialize internal data structures
-        raise NotImplementedError("EventRegistration.__init__ not implemented yet")
-
-    def register(self, user_id: str) -> UserStatus:
-        """
-        Register a user:
-          - if capacity available -> registered
-          - else -> waitlisted (FIFO)
-
-        Raises:
-            DuplicateRequest if user already exists (registered or waitlisted)
-        """
-        # TODO: Implement per lab handout
-        raise NotImplementedError("register not implemented yet")
-
-    def cancel(self, user_id: str) -> None:
-        """
-        Cancel a user:
-          - if registered -> remove and promote earliest waitlisted user (if any)
-          - if waitlisted -> remove from waitlist
-          - behavior when user not found depends on handout (raise NotFound or ignore)
-
-        Raises:
-            NotFound (if required by handout)
-        """
-        # TODO: Implement per lab handout
-        raise NotImplementedError("cancel not implemented yet")
-
-    def status(self, user_id: str) -> UserStatus:
-        """
-        Return status of a user:
-          - registered
-          - waitlisted with position (1-based)
-          - none
-        """
-        # TODO: Implement per lab handout
-        raise NotImplementedError("status not implemented yet")
-
-    def snapshot(self) -> dict:
-        """
-        (Optional helper for debugging/tests)
-        Return a deterministic snapshot of internal state.
-        """
-        # TODO: Implement if required/allowed
-        raise NotImplementedError("snapshot not implemented yet")
-
-}
-
-Response #2 { The model gave a very good description of the code and how it connects with the requirements. It then gave the format for what the code should look like.}
-
-
-
-Prompt #3 { What happens to the raise NotImplementedError("cancel not implemented yet") under the TODO parts. Do I just delete them? or can i leave them there? }
-
-Response #3 {The model explained that i needed to delete them because throws an error every time the function runs, and said if I leave it in the method, Python will stop execution immediately and your tests will fail.}
-
---------------------------------------------------
-
-Prompt #4 { Below is the current set of test cases given already. Using the constraints from earlier, can you help with adding a couple more test cases to cover constraints C3, C6 and if there is an unknown user?
-
-def test_register_until_capacity_then_waitlist_fifo_positions():
-
-    # Validates: C4 (registered users must not exceed capacity)
-    # Validates: C5 (waitlist preserves FIFO order)
-    er = EventRegistration(capacity=2)
-
-    s1 = er.register("u1")
-    s2 = er.register("u2")
-    s3 = er.register("u3")
-    s4 = er.register("u4")
-
-    assert s1 == UserStatus("registered")
-    assert s2 == UserStatus("registered")
-    assert s3 == UserStatus("waitlisted", 1)
-    assert s4 == UserStatus("waitlisted", 2)
-
-    snap = er.snapshot()
-    assert snap["registered"] == ["u1", "u2"]
-    assert snap["waitlist"] == ["u3", "u4"]
-
-
-def test_cancel_registered_promotes_earliest_waitlisted_fifo():
-
-    # Validates: C6 (promotion occurs after registered cancellation)
-    # Validates: C5 (FIFO waitlist ordering)
-
-    er = EventRegistration(capacity=1)
-    er.register("u1")
-    er.register("u2")  # waitlist
-    er.register("u3")  # waitlist
-
-    er.cancel("u1")  # should promote u2
-
-    assert er.status("u1") == UserStatus("none")
-    assert er.status("u2") == UserStatus("registered")
-    assert er.status("u3") == UserStatus("waitlisted", 1)
-
-    snap = er.snapshot()
-    assert snap["registered"] == ["u2"]
-    assert snap["waitlist"] == ["u3"]
-
-
-def test_duplicate_register_raises_for_registered_and_waitlisted():
-    
-    # Validates: C2 (user ID must be unique)
-    
-    er = EventRegistration(capacity=1)
-    er.register("u1")
-    with pytest.raises(DuplicateRequest):
-        er.register("u1")
-
-    er.register("u2")  # waitlisted
-    with pytest.raises(DuplicateRequest):
-        er.register("u2")
-
-
-def test_waitlisted_cancel_removes_and_updates_positions():
-    
-    # Validates: C5 (waitlist ordering and position updates)
-    
-    er = EventRegistration(capacity=1)
-    er.register("u1")
-    er.register("u2")  # waitlist pos1
-    er.register("u3")  # waitlist pos2
-
-    er.cancel("u2")    # remove from waitlist
-
-    assert er.status("u2") == UserStatus("none")
-    assert er.status("u3") == UserStatus("waitlisted", 1)
-
-    snap = er.snapshot()
-    assert snap["registered"] == ["u1"]
-    assert snap["waitlist"] == ["u3"]
-
-
-def test_capacity_zero_all_waitlisted_and_promotion_never_happens():
-    
-    # Validates: C1 (capacity must allow zero)
-    # Validates: C4 (registered users never exceed capacity)
-    
-    er = EventRegistration(capacity=0)
-    assert er.register("u1") == UserStatus("waitlisted", 1)
-    assert er.register("u2") == UserStatus("waitlisted", 2)
-
-    # No one can ever be registered when capacity=0
-    assert er.status("u1") == UserStatus("waitlisted", 1)
-    assert er.status("u2") == UserStatus("waitlisted", 2)
-    assert er.snapshot()["registered"] == []
-
-    # Cancel unknown should raise NotFound
-    with pytest.raises(NotFound):
-        er.cancel("missing")
-
-}
-
-Response #4 {The model gave 3 different test cases which were designed for the targeted constraints. }

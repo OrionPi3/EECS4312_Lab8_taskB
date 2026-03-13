@@ -1,0 +1,135 @@
+#Problem Understanding
+System purpose: The system manages event registrations with limited capacity and a waitlist.
+Inputs to the system:
+- capacity (integer)
+- user_id (string)
+Outputs produced by the system:
+- UserStatus object telling whether a user is registered, waitlisted, or not in the system all together.
+Primary goal of the system:
+To maintain a consistent and deterministic event registration system that handles waitlists, cancellations, and status queries automatically.
+------------------------------------------------------------------------------------------------------------------------------
+#Assumptions
+A1: Each user is uniquely identified by a user_id string.
+A2: The system manages only one event at a time.
+A3: Users may register, cancel, or check their status at any time.
+A4: The system maintains deterministic ordering of waitlisted users.
+A5: System operations occur sequentially.
+A6: Capacity is a non-negative integer.
+------------------------------------------------------------------------------------------------------------------------------
+#Functional Requirements
+FR1: The system shall allow users to register for an event.
+FR2: The system shall register users until the event capacity is reached.
+FR3: The system shall place additional users on a FIFO waitlist when capacity is full.
+FR4: The system shall automatically promote the earliest waitlisted user when a registered user cancels.
+FR5: The system shall prevent duplicate registrations from the same user.
+FR6: The system shall allow users to cancel their registration or waitlist entry.
+FR7: The system shall allow users to query their current status.
+------------------------------------------------------------------------------------------------------------------------------
+#Constraints
+C1:
+Derived from persona attribute:
+Jane – predictable system behavior.
+The system must maintain deterministic ordering of registered and waitlisted users.
+
+C2:
+Derived from persona attribute:
+Jane – automatic conflict resolution.
+The system must automatically promote the earliest waitlisted user when a registered user cancels.
+
+C3:
+Derived from persona attribute:
+Jane – avoid duplicate actions.
+A user may not appear more than once in the system.
+
+C4: 
+Derived from persona attribute:
+Jane – minimal notifications,
+A user should not recieve an overload of notifications.
+
+C5:
+Derived from persona attribute:
+Mo – deterministic behavior.
+Identical sequences of operations must produce identical system states.
+
+C6:
+Derived from persona attribute:
+Mo – explicit handling of invalid operations.
+The system must raise an error when cancelling a non-existent user.
+
+C7:
+Derived from persona attribute:
+Mo – explicit handling of edge cases.
+The system must correctly handle cases where capacity equals zero.
+
+C8:
+Derived from persona attribute:
+Mo - identical inputs produce identical results.
+The system must produce the same output for the same input, regardless of timing or order of operations.
+-------------------------------------------------------------------------------------------------------------------------------
+#Acceptance Criteria
+AC1:
+Given an event with available capacity
+When a user registers
+Then the user is added to the registered list.
+
+AC2:
+Given the event capacity is full
+When a new user registers
+Then the user is added to the waitlist.
+
+AC3:
+Given a registered user cancels
+When the waitlist contains users
+Then the earliest waitlisted user is promoted.
+
+AC4:
+Given a user already exists in the system
+When the user registers again
+Then a DuplicateRequest exception is raised.
+
+AC5:
+Given a cancellation request for a user not in the system
+When cancel is called
+Then a NotFound exception is raised.
+
+AC6:
+Given capacity equals zero
+When users register
+Then all users are placed on the waitlist.
+--------------------------------------------------------------------------------------------------------------------------------
+#Edge Cases
+EC1:
+Capacity equals zero.
+Expected behavior: All users are placed on the waitlist.
+
+EC2:
+User attempts duplicate registration.
+Expected behavior: DuplicateRequest exception is raised.
+
+EC3:
+Registered user cancels when waitlist exists.
+Expected behavior: earliest waitlisted user is promoted.
+
+EC4:
+Waitlisted user cancels before promotion.
+Expected behavior: user is removed from waitlist.
+
+EC5:
+Multiple cancellations occur consecutively.
+Expected behavior: promotions occur in FIFO order.
+
+EC6:
+Cancellation requested for unknown user.
+Expected behavior: NotFound exception is raised.
+---------------------------------------------------------------------------------------------------------------------------------
+# 7. Traceability
+FR1 → C1 → AC1
+FR2 → C1 → AC2
+FR3 → C2 → AC3
+FR4 → C2 → AC3
+FR5 → C3 → AC4
+FR6 → C5 → AC5
+FR7 → C6 → AC6
+------------------------------------------------------------------------------------------------------------------
+#Revision Logs
+- none at the moment.
